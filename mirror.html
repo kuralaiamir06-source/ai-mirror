@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AI Mirror App</title>
+
+<script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs-core"></script>
+<script src="https://cdn.jsdelivr.net/npm/@tensorflow-models/face-landmarks-detection"></script>
+
+<style>
+body {
+    margin: 0;
+    font-family: Arial;
+    background: #0f0f0f;
+    color: white;
+    text-align: center;
+}
+
+/* NAV */
+nav {
+    display: flex;
+    justify-content: space-around;
+    padding: 15px;
+    background: #111;
+}
+
+button {
+    padding: 10px 15px;
+    margin: 5px;
+    border-radius: 10px;
+    border: none;
+    cursor: pointer;
+}
+
+/* SECTIONS */
+.section {
+    display: none;
+    padding: 20px;
+}
+
+.active {
+    display: block;
+}
+
+/* CAMERA */
+.video-box {
+    position: relative;
+    display: inline-block;
+}
+
+video, canvas {
+    border-radius: 20px;
+}
+
+canvas {
+    position: absolute;
+    left: 0;
+    top: 0;
+}
+</style>
+</head>
+
+<body>
+
+<nav>
+    <button onclick="show('home')">Home</button>
+    <button onclick="show('scan')">Face Scan</button>
+    <button onclick="show('ar')">AR Tutorial</button>
+    <button onclick="show('profile')">Profile</button>
+</nav>
+
+<!-- HOME -->
+<div id="home" class="section active">
+    <h1>AI Mirror Assistant</h1>
+    <p>Real-time beauty AI</p>
+</div>
+
+<!-- FACE SCAN -->
+<div id="scan" class="section">
+    <h2>Face Scan</h2>
+    <button onclick="startCamera()">Start Camera</button>
+    <button onclick="analyzeFace()">Analyze</button>
+    <p id="result"></p>
+</div>
+
+<!-- AR -->
+<div id="ar" class="section">
+    <h2>AR Tutorial</h2>
+
+    <div class="video-box">
+        <video id="video" width="320" height="400" autoplay></video>
+        <canvas id="canvas" width="320" height="400"></canvas>
+    </div>
+
+    <br>
+    <button onclick="startAR()">Start AR</button>
+</div>
+
+<!-- PROFILE -->
+<div id="profile" class="section">
+    <h2>Profile</h2>
+    <p id="profileData">No saved data</p>
+    <button onclick="loadProfile()">Load Profile</button>
+</div>
+
+<script>
+let video = document.getElementById("video");
+let canvas = document.getElementById("canvas");
+let ctx = canvas.getContext("2d");
+let model;
+let stream;
+
+// NAVIGATION
+function show(id) {
+    document.querySelectorAll(".section").forEach(s => s.classList.remove("active"));
+    document.getElementById(id).classList.add("active");
+}
+
+// CAMERA
+async function startCamera() {
+    stream = await navigator.mediaDevices.getUserMedia({ video: true });
+    video.srcObject = stream;
+}
+
+// FAKE AI ANALYSIS
+function analyzeFace() {
+    const tones = ["Warm", "Cool", "Neutral"];
+    const shapes = ["Oval", "Round", "Square"];
+
+    const result = {
+        tone: tones[Math.floor(Math.random()*3)],
+        shape: shapes[Math.floor(Math.random()*3)]
+    };
+
+    document.getElementById("result").innerText =
+        "Skin tone: " + result.tone + " | Face shape: " + result.shape;
+
+    localStorage.setItem("profile", JSON.stringify(result));
+}
+
+// LOAD PROFILE
+function loadProfile() {
+    const data = localStorage.getItem("profile");
+    if (data) {
+        const p = JSON.parse(data);
+        document.getElementById("profileData").innerText =
+            "Saved → Tone: " + p.tone + ", Shape: " + p.shape;
+    }
+}
+
+// AR FUNCTION
+async function startAR() {
+    await startCamera();
+
+    model = await faceLandmarksDetection.load(
+        faceLandmarksDetection.SupportedPackages.mediapipeFacemesh
+    );
+
+    detect();
+}
+
+async function detect() {
+    const predictions = await model.estimateFaces({ input: video });
+
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+    if (predictions.length > 0) {
+        const keypoints = predictions[0].scaledMesh;
+
+        // lips highlight
+        ctx.fillStyle = "rgba(255, 0, 100, 0.3)";
+        const lips = [61,146,91,181,84,17,314,405,321,375,291,308];
+
+        ctx.beginPath();
+        lips.forEach((i, index) => {
+            const [x, y] = keypoints[i];
+            if (index === 0) ctx.moveTo(x, y);
+            else ctx.lineTo(x, y);
+        });
+        ctx.closePath();
+        ctx.fill();
+    }
+
+    requestAnimationFrame(detect);
+}
+</script>
+
+</body>
+</html>
