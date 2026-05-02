@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AI Mirror Assistant</title>
+
+<style>
+body {
+    margin: 0;
+    font-family: 'Inter', sans-serif;
+    background: #faf7f5;
+    color: #1a1a1a;
+}
+
+/* NAVBAR */
+.navbar {
+    display: flex;
+    justify-content: space-between;
+    padding: 20px 40px;
+    background: rgba(255,255,255,0.7);
+    backdrop-filter: blur(10px);
+    position: fixed;
+    width: 100%;
+}
+
+.logo {
+    font-weight: 600;
+    font-size: 18px;
+}
+
+.nav-links a {
+    margin-left: 20px;
+    text-decoration: none;
+    color: #333;
+}
+
+/* HERO */
+.hero {
+    height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    background: linear-gradient(120deg, #fdfbfb, #f6e9e6);
+}
+
+.hero h1 {
+    font-size: 48px;
+    margin-bottom: 20px;
+}
+
+.hero p {
+    max-width: 500px;
+    margin: auto;
+    color: #666;
+}
+
+.btn {
+    margin-top: 30px;
+    padding: 12px 24px;
+    border: none;
+    border-radius: 30px;
+    background: #e8b4b8;
+    color: white;
+    cursor: pointer;
+    font-size: 16px;
+}
+
+/* FEATURES */
+.features {
+    padding: 80px 40px;
+    display: flex;
+    justify-content: space-around;
+    flex-wrap: wrap;
+}
+
+.feature {
+    width: 300px;
+    margin: 20px;
+}
+
+.feature h3 {
+    margin-bottom: 10px;
+}
+
+/* AR DEMO BLOCK */
+.demo {
+    padding: 80px 40px;
+    text-align: center;
+}
+
+.camera-box {
+    width: 300px;
+    height: 400px;
+    margin: auto;
+    border-radius: 20px;
+    background: #ddd;
+    position: relative;
+    overflow: hidden;
+}
+
+/* fake AR lines */
+.line {
+    position: absolute;
+    border: 2px dashed rgba(255,255,255,0.7);
+    border-radius: 50%;
+}
+
+.line1 {
+    width: 180px;
+    height: 200px;
+    top: 80px;
+    left: 60px;
+}
+
+.line2 {
+    width: 120px;
+    height: 60px;
+    top: 200px;
+    left: 90px;
+}
+
+/* FOOTER */
+.footer {
+    padding: 40px;
+    text-align: center;
+    background: #fff;
+    color: #999;
+}
+</style>
+</head>
+
+<body>
+
+<!-- NAVBAR -->
+<div class="navbar">
+    <div class="logo">AI Mirror</div>
+    <div class="nav-links">
+        <a href="#">Features</a>
+        <a href="#">Demo</a>
+        <a href="#">Profile</a>
+    </div>
+</div>
+
+<!-- HERO -->
+<section class="hero">
+    <div>
+        <h1>Your Smart Mirror Assistant</h1>
+        <p>AI-powered beauty assistant that guides you in real-time using augmented reality.</p>
+        <button class="btn" onclick="alert('Demo coming soon')">Try Now</button>
+    </div>
+</section>
+
+<!-- FEATURES -->
+<section class="features">
+    <div class="feature">
+        <h3>AI Face Scan</h3>
+        <p>Analyze skin tone, face shape, and conditions instantly.</p>
+    </div>
+
+    <div class="feature">
+        <h3>AR Tutorials</h3>
+        <p>Real-time guidance with overlay lines showing where to apply products.</p>
+    </div>
+
+    <div class="feature">
+        <h3>Smart Profile</h3>
+        <p>Save looks, track preferences, and get product recommendations.</p>
+    </div>
+</section>
+
+<!-- DEMO -->
+<section class="demo">
+    <h2>Live AR Preview</h2>
+    <div class="camera-box">
+        <div class="line line1"></div>
+        <div class="line line2"></div>
+    </div>
+</section>
+
+<!-- FOOTER -->
+<div class="footer">
+    © 2026 AI Mirror Assistant
+</div>
+
+</body>
+</html>
