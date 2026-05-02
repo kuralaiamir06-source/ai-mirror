@@ -1,190 +1,202 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>AI Mirror App</title>
+// AI Mirror Assistant – Full Feminine Pink Edition (Expanded Real App)
+// React + Tailwind + Webcam + Mock AI + AR Overlay Structure
 
-<script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs-core"></script>
-<script src="https://cdn.jsdelivr.net/npm/@tensorflow-models/face-landmarks-detection"></script>
+import { useEffect, useRef, useState } from "react";
 
-<style>
-body {
-    margin: 0;
-    font-family: Arial;
-    background: #0f0f0f;
-    color: white;
-    text-align: center;
-}
+/****************************
+ * MAIN APP
+ ****************************/
+export default function AIMirrorApp() {
+  const videoRef = useRef(null);
+  const canvasRef = useRef(null);
 
-/* NAV */
-nav {
-    display: flex;
-    justify-content: space-around;
-    padding: 15px;
-    background: #111;
-}
+  const [streaming, setStreaming] = useState(false);
+  const [analysis, setAnalysis] = useState(null);
+  const [facePoints, setFacePoints] = useState([]);
 
-button {
-    padding: 10px 15px;
-    margin: 5px;
-    border-radius: 10px;
-    border: none;
-    cursor: pointer;
-}
+  /****************************
+   * CAMERA CONTROL
+   ****************************/
+  const startCamera = async () => {
+    try {
+      const stream = await navigator.mediaDevices.getUserMedia({ video: true });
+      videoRef.current.srcObject = stream;
+      setStreaming(true);
+    } catch (err) {
+      console.error(err);
+      alert("Camera access denied");
+    }
+  };
 
-/* SECTIONS */
-.section {
-    display: none;
-    padding: 20px;
-}
+  const stopCamera = () => {
+    const stream = videoRef.current?.srcObject;
+    if (stream) {
+      stream.getTracks().forEach((t) => t.stop());
+      videoRef.current.srcObject = null;
+    }
+    setStreaming(false);
+  };
 
-.active {
-    display: block;
-}
+  /****************************
+   * MOCK AI ANALYSIS
+   ****************************/
+  const runAnalysis = () => {
+    setAnalysis({
+      skinTone: "Soft Warm",
+      faceShape: "Oval",
+      eyes: "Almond",
+      lips: "Balanced",
+      recommendation:
+        "💖 Soft pink blush + glossy lip tint + light contour for harmony",
+    });
 
-/* CAMERA */
-.video-box {
-    position: relative;
-    display: inline-block;
-}
+    // Fake face landmarks for AR demo
+    setFacePoints([
+      { x: 120, y: 80 },
+      { x: 200, y: 90 },
+      { x: 160, y: 140 },
+      { x: 130, y: 200 },
+      { x: 190, y: 200 },
+    ]);
+  };
 
-video, canvas {
-    border-radius: 20px;
-}
+  /****************************
+   * AR DRAWING OVERLAY
+   ****************************/
+  useEffect(() => {
+    const canvas = canvasRef.current;
+    const ctx = canvas?.getContext("2d");
 
-canvas {
-    position: absolute;
-    left: 0;
-    top: 0;
-}
-</style>
-</head>
+    const draw = () => {
+      if (!ctx || !canvas) return;
 
-<body>
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-<nav>
-    <button onclick="show('home')">Home</button>
-    <button onclick="show('scan')">Face Scan</button>
-    <button onclick="show('ar')">AR Tutorial</button>
-    <button onclick="show('profile')">Profile</button>
-</nav>
+      // Pink glow style
+      ctx.strokeStyle = "rgba(255, 105, 180, 0.9)";
+      ctx.fillStyle = "rgba(255, 182, 193, 0.6)";
+      ctx.lineWidth = 3;
 
-<!-- HOME -->
-<div id="home" class="section active">
-    <h1>AI Mirror Assistant</h1>
-    <p>Real-time beauty AI</p>
-</div>
+      facePoints.forEach((p) => {
+        ctx.beginPath();
+        ctx.arc(p.x, p.y, 6, 0, Math.PI * 2);
+        ctx.fill();
+      });
 
-<!-- FACE SCAN -->
-<div id="scan" class="section">
-    <h2>Face Scan</h2>
-    <button onclick="startCamera()">Start Camera</button>
-    <button onclick="analyzeFace()">Analyze</button>
-    <p id="result"></p>
-</div>
-
-<!-- AR -->
-<div id="ar" class="section">
-    <h2>AR Tutorial</h2>
-
-    <div class="video-box">
-        <video id="video" width="320" height="400" autoplay></video>
-        <canvas id="canvas" width="320" height="400"></canvas>
-    </div>
-
-    <br>
-    <button onclick="startAR()">Start AR</button>
-</div>
-
-<!-- PROFILE -->
-<div id="profile" class="section">
-    <h2>Profile</h2>
-    <p id="profileData">No saved data</p>
-    <button onclick="loadProfile()">Load Profile</button>
-</div>
-
-<script>
-let video = document.getElementById("video");
-let canvas = document.getElementById("canvas");
-let ctx = canvas.getContext("2d");
-let model;
-let stream;
-
-// NAVIGATION
-function show(id) {
-    document.querySelectorAll(".section").forEach(s => s.classList.remove("active"));
-    document.getElementById(id).classList.add("active");
-}
-
-// CAMERA
-async function startCamera() {
-    stream = await navigator.mediaDevices.getUserMedia({ video: true });
-    video.srcObject = stream;
-}
-
-// FAKE AI ANALYSIS
-function analyzeFace() {
-    const tones = ["Warm", "Cool", "Neutral"];
-    const shapes = ["Oval", "Round", "Square"];
-
-    const result = {
-        tone: tones[Math.floor(Math.random()*3)],
-        shape: shapes[Math.floor(Math.random()*3)]
+      // simple face guide lines
+      if (facePoints.length > 0) {
+        ctx.beginPath();
+        ctx.moveTo(facePoints[0]?.x || 0, facePoints[0]?.y || 0);
+        facePoints.forEach((p) => ctx.lineTo(p.x, p.y));
+        ctx.stroke();
+      }
     };
 
-    document.getElementById("result").innerText =
-        "Skin tone: " + result.tone + " | Face shape: " + result.shape;
+    draw();
+  }, [facePoints]);
 
-    localStorage.setItem("profile", JSON.stringify(result));
+  /****************************
+   * UI
+   ****************************/
+  return (
+    <div className="min-h-screen bg-gradient-to-br from-pink-100 via-rose-100 to-fuchsia-200 flex items-center justify-center p-6">
+      <div className="w-full max-w-5xl bg-white/40 backdrop-blur-2xl rounded-3xl shadow-2xl border border-pink-200 p-6">
+        <h1 className="text-3xl font-bold text-center text-pink-600 mb-6">
+          💄 AI Mirror Beauty Assistant PRO
+        </h1>
+
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          {/* CAMERA */}
+          <div className="relative rounded-2xl overflow-hidden border-4 border-pink-300 shadow-lg">
+            <video
+              ref={videoRef}
+              autoPlay
+              playsInline
+              className="w-full h-[400px] object-cover"
+            />
+
+            <canvas
+              ref={canvasRef}
+              width={640}
+              height={400}
+              className="absolute top-0 left-0 w-full h-full"
+            />
+
+            <div className="absolute bottom-3 left-3 flex gap-2">
+              {!streaming ? (
+                <button
+                  onClick={startCamera}
+                  className="px-4 py-2 bg-pink-500 text-white rounded-full shadow"
+                >
+                  Start
+                </button>
+              ) : (
+                <button
+                  onClick={stopCamera}
+                  className="px-4 py-2 bg-rose-600 text-white rounded-full shadow"
+                >
+                  Stop
+                </button>
+              )}
+
+              <button
+                onClick={runAnalysis}
+                className="px-4 py-2 bg-fuchsia-500 text-white rounded-full shadow"
+              >
+                AI Scan 💕
+              </button>
+            </div>
+          </div>
+
+          {/* ANALYSIS PANEL */}
+          <div className="bg-white/60 rounded-2xl p-5 border border-pink-200 shadow-inner">
+            <h2 className="text-xl font-semibold text-pink-600 mb-4">
+              Beauty Analysis
+            </h2>
+
+            {analysis ? (
+              <div className="space-y-3 text-pink-700">
+                <p>Skin Tone: {analysis.skinTone}</p>
+                <p>Face Shape: {analysis.faceShape}</p>
+                <p>Eyes: {analysis.eyes}</p>
+                <p>Lips: {analysis.lips}</p>
+
+                <div className="mt-4 p-3 bg-pink-100 rounded-xl text-rose-600 font-medium">
+                  {analysis.recommendation}
+                </div>
+              </div>
+            ) : (
+              <p className="text-gray-500">
+                Run AI Scan to get personalized beauty tips 💖
+              </p>
+            )}
+          </div>
+        </div>
+
+        {/* FOOTER */}
+        <div className="text-center mt-6 text-pink-500 text-sm">
+          AI Mirror PRO • Feminine UI Edition • React Demo
+        </div>
+      </div>
+    </div>
+  );
 }
 
-// LOAD PROFILE
-function loadProfile() {
-    const data = localStorage.getItem("profile");
-    if (data) {
-        const p = JSON.parse(data);
-        document.getElementById("profileData").innerText =
-            "Saved → Tone: " + p.tone + ", Shape: " + p.shape;
-    }
-}
+/****************************
+ * OPTIONAL FIREBASE (placeholder)
+ ****************************/
 
-// AR FUNCTION
-async function startAR() {
-    await startCamera();
+/*
+import { initializeApp } from "firebase/app";
 
-    model = await faceLandmarksDetection.load(
-        faceLandmarksDetection.SupportedPackages.mediapipeFacemesh
-    );
+const firebaseConfig = {
+  apiKey: "YOUR_KEY",
+  authDomain: "YOUR_DOMAIN",
+  projectId: "YOUR_PROJECT",
+  storageBucket: "YOUR_BUCKET",
+  messagingSenderId: "ID",
+  appId: "APP_ID",
+};
 
-    detect();
-}
-
-async function detect() {
-    const predictions = await model.estimateFaces({ input: video });
-
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
-
-    if (predictions.length > 0) {
-        const keypoints = predictions[0].scaledMesh;
-
-        // lips highlight
-        ctx.fillStyle = "rgba(255, 0, 100, 0.3)";
-        const lips = [61,146,91,181,84,17,314,405,321,375,291,308];
-
-        ctx.beginPath();
-        lips.forEach((i, index) => {
-            const [x, y] = keypoints[i];
-            if (index === 0) ctx.moveTo(x, y);
-            else ctx.lineTo(x, y);
-        });
-        ctx.closePath();
-        ctx.fill();
-    }
-
-    requestAnimationFrame(detect);
-}
-</script>
-
-</body>
-</html>
+export const app = initializeApp(firebaseConfig);
+*/
