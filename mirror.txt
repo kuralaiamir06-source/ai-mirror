@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AI Mirror</title>
+
+<style>
+body {
+    margin: 0;
+    font-family: Arial;
+    background: #0f0f0f;
+    color: white;
+}
+
+/* NAV */
+nav {
+    position: fixed;
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
+    padding: 15px 30px;
+    background: rgba(0,0,0,0.6);
+}
+
+nav button {
+    margin-left: 10px;
+}
+
+/* SECTIONS */
+section {
+    padding: 100px 20px;
+    text-align: center;
+}
+
+.hidden {
+    display: none;
+}
+
+/* CAMERA */
+.video-container {
+    position: relative;
+    display: inline-block;
+}
+
+video {
+    width: 320px;
+    border-radius: 20px;
+}
+
+/* FAKE AR */
+.line {
+    position: absolute;
+    border: 2px dashed pink;
+    border-radius: 50%;
+    opacity: 0.7;
+}
+
+.line1 {
+    width: 180px;
+    height: 200px;
+    top: 50px;
+    left: 70px;
+}
+
+.line2 {
+    width: 120px;
+    height: 60px;
+    top: 180px;
+    left: 100px;
+}
+</style>
+</head>
+
+<body>
+
+<nav>
+    <div>AI Mirror</div>
+    <div>
+        <button onclick="showSection('home')">Home</button>
+        <button onclick="showSection('camera')">Camera</button>
+        <button onclick="showSection('profile')">Profile</button>
+    </div>
+</nav>
+
+<!-- HOME -->
+<section id="home">
+    <h1>Smart Beauty Assistant</h1>
+    <p>AI + AR guidance in real time</p>
+</section>
+
+<!-- CAMERA -->
+<section id="camera" class="hidden">
+    <h2>Camera Mode</h2>
+
+    <div class="video-container">
+        <video id="video" autoplay></video>
+        <div id="arLines" class="hidden">
+            <div class="line line1"></div>
+            <div class="line line2"></div>
+        </div>
+    </div>
+
+    <br><br>
+
+    <button onclick="startCamera()">Start Camera</button>
+    <button onclick="stopCamera()">Stop Camera</button>
+    <button onclick="toggleAR()">Toggle AR</button>
+</section>
+
+<!-- PROFILE -->
+<section id="profile" class="hidden">
+    <h2>Your Profile</h2>
+    <p id="status">Camera not used yet</p>
+</section>
+
+<script>
+let stream = null;
+
+// NAVIGATION
+function showSection(sectionId) {
+    document.querySelectorAll("section").forEach(sec => {
+        sec.classList.add("hidden");
+    });
+    document.getElementById(sectionId).classList.remove("hidden");
+}
+
+// CAMERA
+function startCamera() {
+    navigator.mediaDevices.getUserMedia({ video: true })
+    .then(s => {
+        stream = s;
+        document.getElementById("video").srcObject = stream;
+        document.getElementById("status").innerText = "Camera is active";
+    })
+    .catch(() => alert("Camera access denied"));
+}
+
+function stopCamera() {
+    if (stream) {
+        stream.getTracks().forEach(track => track.stop());
+        document.getElementById("video").srcObject = null;
+        document.getElementById("status").innerText = "Camera stopped";
+    }
+}
+
+// AR TOGGLE
+function toggleAR() {
+    document.getElementById("arLines").classList.toggle("hidden");
+}
+</script>
+
+</body>
+</html>
